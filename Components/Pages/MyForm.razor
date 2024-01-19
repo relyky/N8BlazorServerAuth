@@ -1,0 +1,74 @@
+﻿@page "/myform"
+
+@using System.ComponentModel.DataAnnotations
+
+<MudContainer>
+
+  <EditForm Model="@Input" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+      <MudItem xs="12" sm="7">
+        <MudCard>
+          <MudCardContent>
+            <MudTextField Label="Email" Class="mt-3"
+                          @bind-Value="Input.Email" For="() => Input.Email" />
+            <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                          @bind-Value="Input.Password" For="() => Input.Password" InputType="InputType.Password" />
+            <MudCheckBox @bind-Value="Input.RememberMe" For="() => Input.RememberMe" Label="記住我" />
+          </MudCardContent>
+          <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">登入</MudButton>
+          </MudCardActions>
+        </MudCard>
+      </MudItem>
+      <MudItem xs="12" sm="5">
+        <MudPaper Class="pa-4 mud-height-full">
+          <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+          @if (success)
+          {
+            <MudText Color="Color.Success">Success</MudText>
+          }
+          else
+          {
+            <MudText Color="@Color.Error">
+              <ValidationSummary />
+            </MudText>
+          }
+        </MudPaper>
+      </MudItem>
+      <MudItem xs="12">
+        <MudText Typo="Typo.body2" Align="Align.Center">
+          Fill out the form correctly to see the success message.
+        </MudText>
+      </MudItem>
+    </MudGrid>
+  </EditForm>
+
+</MudContainer>
+
+
+@code {
+  InputModel Input = new InputModel();
+  bool success;
+
+  private sealed class InputModel
+  {
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = "foo@mail.server";
+
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; } = "user credential";
+
+    [Display(Name = "Remember me?")]
+    public bool RememberMe { get; set; }
+  }
+
+  private void OnValidSubmit(EditContext context)
+  {
+    success = true;
+    StateHasChanged();
+  }
+
+}

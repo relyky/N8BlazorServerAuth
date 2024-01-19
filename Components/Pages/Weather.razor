@@ -3,39 +3,32 @@
 
 <PageTitle>Weather</PageTitle>
 
-<h1>Weather</h1>
+<MudContainer>
+  <MudText Typo=Typo.h3>Weather</MudText>
+  <MudText Typo=Typo.body1>This component demonstrates showing data.</MudText>
+  <MudButton Variant=Variant.Filled Color=Color.Primary OnClick=HandleRefresh>刷新</MudButton>
 
-<p>This component demonstrates showing data.</p>
-<button class="btn btn-primary" @onclick=HandleRefresh>刷新</button>
+  @if (f_loading)
+  {
+    <MudProgressLinear Indeterminate Color=Color.Info />
+  }
+  else if (forecasts != null)
+  {
+    <MudDataGrid Items=forecasts>
+      <Columns>
+        <PropertyColumn Property="m => m.Date" Title="Date">
+          <CellTemplate>
+            @context.Item.Date.ToShortDateString()
+          </CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="m => m.TemperatureC" Title="Temp. (C)" />
+        <PropertyColumn Property="m => m.TemperatureF" Title="Temp. (F)" />
+        <PropertyColumn Property="m => m.Summary" Title="Summary" />
+      </Columns>
+    </MudDataGrid>
+  }
 
-@if (f_loading)
-{
-  <p><em>Loading...</em></p>
-}
-else if (forecasts != null)
-{
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Date</th>
-        <th>Temp. (C)</th>
-        <th>Temp. (F)</th>
-        <th>Summary</th>
-      </tr>
-    </thead>
-    <tbody>
-      @foreach (var forecast in forecasts)
-      {
-        <tr>
-          <td>@forecast.Date.ToShortDateString()</td>
-          <td>@forecast.TemperatureC</td>
-          <td>@forecast.TemperatureF</td>
-          <td>@forecast.Summary</td>
-        </tr>
-      }
-    </tbody>
-  </table>
-}
+</MudContainer>
 
 @code {
   WeatherForecast[]? forecasts;

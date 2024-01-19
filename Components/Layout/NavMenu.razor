@@ -1,52 +1,20 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="">N8BlazorServerAuth</a>
-  </div>
-</div>
+﻿
+<MudNavLink Href="/" Icon=@Icons.Material.Rounded.Home IconColor=Color.Primary>首頁</MudNavLink>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<MudNavGroup Title="功能群組" Icon=@Icons.Material.Rounded.GridView IconColor=Color.Primary Expanded=true>
+  <MudNavLink Href="/auth">Auth</MudNavLink>
+  <MudNavLink Href="/counter">Counter</MudNavLink>
+  <MudNavLink Href="/weather">Weather</MudNavLink>
+  <MudNavLink Href="/myform">My Form</MudNavLink>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-  <nav class="flex-column">
-    <div class="nav-item px-3">
-      <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-      </NavLink>
-    </div>
+  <MudDivider DividerType=DividerType.Middle Class="my-2" />
+  <AuthorizeView>
+    <NotAuthorized>
+      <MudNavLink Href="/Account/Login" Icon=@Icons.Material.Filled.Login IconColor=Color.Primary>登入</MudNavLink>
+    </NotAuthorized>
+    <Authorized>
+      <MudNavLink Href="/Account/Logout" Icon=@Icons.Material.Filled.Logout IconColor=Color.Primary>登出</MudNavLink>
+    </Authorized>
+  </AuthorizeView>
 
-    <div class="nav-item px-3">
-      <NavLink class="nav-link" href="auth">
-        <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth
-      </NavLink>
-    </div>
-
-    <div class="nav-item px-3">
-      <NavLink class="nav-link" href="counter">
-        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-      </NavLink>
-    </div>
-
-    <div class="nav-item px-3">
-      <NavLink class="nav-link" href="weather">
-        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-      </NavLink>
-    </div>
-
-    <AuthorizeView>
-      <Authorized>
-        <div class="nav-item px-3">
-          <NavLink class="nav-link" href="Account/Logout">
-            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-          </NavLink>
-        </div>
-      </Authorized>
-      <NotAuthorized>
-        <div class="nav-item px-3">
-          <NavLink class="nav-link" href="Account/Login">
-            <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-          </NavLink>
-        </div>
-      </NotAuthorized>
-    </AuthorizeView>
-  </nav>
-</div>
+</MudNavGroup>

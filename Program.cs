@@ -2,12 +2,15 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using N8BlazorServerAuth.Components;
 using N8BlazorServerAuth.Services;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddMudServices();
 
 //# for BLAZOR COOKIE Auth
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();

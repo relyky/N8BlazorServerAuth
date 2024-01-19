@@ -4,31 +4,40 @@
 
 <PageTitle>授權狀態</PageTitle>
 
-<h1>授權狀態</h1>
+<MudContainer>
+  <MudText Typo=Typo.h3>授權狀態</MudText>
 
-<AuthorizeView Context="auth">
-  <Authorized>
-    <h2>You are authenticated</h2>
-    <h2>Hello @auth.User.Identity?.Name</h2>
-  </Authorized>
-  <Authorizing>
-    <h2>In authorizing...</h2>
-  </Authorizing>
-  <NotAuthorized>
-    <h2>Not Authorized</h2>
-  </NotAuthorized>
-</AuthorizeView>
+  <AuthorizeView Context="auth">
+    <Authorized>
+      <MudText Typo=Typo.h4>You are authenticated</MudText>
+      <MudText Typo=Typo.h4>Hello @auth.User.Identity?.Name</MudText>
+      </Authorized>
+      <Authorizing>
+        <MudText Typo=Typo.h4>In authorizing...</MudText>
+      </Authorizing>
+      <NotAuthorized>
+        <MudText Typo=Typo.h4>Not Authorized</MudText>
+      </NotAuthorized>
+    </AuthorizeView>
 
-<hr />
-<h5>Auth State</h5>
-<dl>
-  <dt>IsAuthenticated</dt>
-  <dd>@authUser?.Identity?.IsAuthenticated</dd>
-  <dt>Name</dt>
-  <dd>@authUser?.Identity?.Name</dd>
-</dl>
+    <MudDivider Class="my-3" />
 
-@code {
+    <MudText Typo=Typo.h4>Auth State</MudText>
+    <MudSimpleTable Style="overflow-x: auto;">
+      <tbody>
+        <tr>
+          <td>IsAuthenticated</td>
+          <td>@(authUser?.Identity?.IsAuthenticated)</td>
+        </tr>
+        <tr>
+          <td>Name</td>
+          <td>@(authUser?.Identity?.Name)</td>
+        </tr>
+      </tbody>
+    </MudSimpleTable>
+  </MudContainer>
+
+  @code {
   [CascadingParameter] Task<AuthenticationState> AuthStateTask { get; set; } = default!;
 
   //## State
