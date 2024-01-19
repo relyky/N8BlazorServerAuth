@@ -31,6 +31,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
       cfg.Cookie.Name = ".N8BlazorServerAuth.Cookies"; //default:.AspNetCore.Cookies
     });
 
+//§§ 註冊：客製服務
+builder.Services.AddSingleton<AccountService>();
+
 var app = builder.Build(); //--------------------------------------------------
 
 // Configure the HTTP request pipeline.

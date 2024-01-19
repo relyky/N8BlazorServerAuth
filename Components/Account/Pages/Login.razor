@@ -2,15 +2,24 @@
 @using Microsoft.AspNetCore.Authentication.Cookies
 @using Microsoft.AspNetCore.Authentication
 @using System.Security.Claims
+@using N8BlazorServerAuth.Services
 
 @page "/Account/Login"
 @inject NavigationManager navSvc
 @inject ILogger<Login> Logger
+@inject AccountService accSvc
 
 <PageTitle>Log in</PageTitle>
 
 <div class="container">
   <h1>Log in</h1>
+ 
+  @if (errorMessage != null)
+  {
+    <div class="alert alert-danger" role="alert">
+      @errorMessage
+    </div>
+  }
 
   <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
     <DataAnnotationsValidator />
@@ -37,6 +46,8 @@
       <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
     </div>
   </EditForm>
+
+
 </div>
 
 @code {
@@ -49,6 +60,8 @@
   [SupplyParameterFromQuery]
   private string? ReturnUrl { get; set; }
 
+  string? errorMessage;
+
   protected override async Task OnInitializedAsync()
   {
     if (HttpMethods.IsGet(HttpContext.Request.Method))
@@ -60,22 +73,32 @@
 
   public async Task LoginUser()
   {
-    // 使用者聲明
-    var userClaims = new List <Claim>
+    errorMessage = null;
+    var authUser = accSvc.Authenticate(Input.Password);
+    if (authUser == null)
     {
-        new Claim(ClaimTypes.Name, "beauty"), // 使用者識別碼
-        new Claim(ClaimTypes.Sid, Guid.NewGuid().ToString()), // 登入識別序號
-        new Claim(ClaimTypes.GivenName, "甄美麗"), // 顯示名稱
-        new Claim(ClaimTypes.Role, "Admin"),
+      errorMessage = "Error: Invalid login attempt.";
+      return;
+    }
+
+    // 使用者聲明
+    var userClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, authUser.UserId), // 使用者識別碼
+        new Claim(ClaimTypes.Sid, authUser.AuthGuid.ToString()), // 登入識別序號
+        new Claim(ClaimTypes.GivenName, authUser.UserName), // 顯示名稱
     };
 
-    var userIdentity = new ClaimsIdentity(userClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+    // 使用者聲明－角色
+    foreach (var role in authUser.Roles)
+      userClaims.Add(new Claim(ClaimTypes.Role, role));
 
+    var userIdentity = new ClaimsIdentity(userClaims, CookieAuthenticationDefaults.AuthenticationScheme);
     var authProperties = new AuthenticationProperties
       {
-        IsPersistent = false, // authUser.RememberMe,
-        IssuedUtc = DateTime.UtcNow, // authUser.IssuedUtc,
-        ExpiresUtc = DateTime.UtcNow.AddMinutes(30), // authUser.ExpiresUtc,
+        IsPersistent = authUser.RememberMe,
+        IssuedUtc = authUser.IssuedUtc,
+        ExpiresUtc = authUser.ExpiresUtc,
         RedirectUri = ReturnUrl, // this.Request.Host.Value
         //AllowRefresh = <bool>,
         // Refreshing the authentication session should be allowed.
@@ -99,7 +122,7 @@
 
     [Required]
     [DataType(DataType.Password)]
-    public string Password { get; set; } = "bar";
+    public string Password { get; set; } = "user credential";
 
     [Display(Name = "Remember me?")]
     public bool RememberMe { get; set; }
