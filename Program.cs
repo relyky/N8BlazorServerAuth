@@ -51,6 +51,12 @@ app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 
+//§§ HTTP 400-599 錯誤處理 
+/// 根據預設，ASP.NET Core 應用程式不會提供 HTTP 錯誤狀態碼 (例如「404 - 找不到」) 的狀態碼頁面。 
+/// 當應用程式設定沒有本文的 HTTP 400-599 錯誤狀態碼時，它會傳回該狀態碼和一個空白的回應本文。 
+/// ref→https://learn.microsoft.com/zh-tw/aspnet/core/fundamentals/error-handling?view=aspnetcore-8.0#usestatuscodepages
+app.UseStatusCodePagesWithRedirects("/ErrorStatus/{0}");
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
