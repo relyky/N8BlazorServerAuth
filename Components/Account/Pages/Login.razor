@@ -1,0 +1,107 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.AspNetCore.Authentication
+@using System.Security.Claims
+
+@page "/Account/Login"
+@inject NavigationManager navSvc
+@inject ILogger<Login> Logger
+
+<PageTitle>Log in</PageTitle>
+
+<h1>Log in</h1>
+
+<EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+  <DataAnnotationsValidator />
+  <h2>Use a local account to log in.</h2>
+  <hr />
+  <ValidationSummary class="text-danger" role="alert" />
+  <div class="form-floating mb-3">
+    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+    <label for="email" class="form-label">Email</label>
+    <ValidationMessage For="() => Input.Email" class="text-danger" />
+  </div>
+  <div class="form-floating mb-3">
+    <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+    <label for="password" class="form-label">Password</label>
+    <ValidationMessage For="() => Input.Password" class="text-danger" />
+  </div>
+  <div class="checkbox mb-3">
+    <label class="form-label">
+      <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
+      Remember me
+    </label>
+  </div>
+  <div>
+    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+  </div>
+</EditForm>
+
+@code {
+  private string? errorMessage;
+
+  [CascadingParameter]
+  private HttpContext HttpContext { get; set; } = default!;
+
+  [SupplyParameterFromForm]
+  private InputModel Input { get; set; } = new();
+
+  [SupplyParameterFromQuery]
+  private string? ReturnUrl { get; set; }
+
+  protected override async Task OnInitializedAsync()
+  {
+    if (HttpMethods.IsGet(HttpContext.Request.Method))
+    {
+      // Clear the existing external cookie to ensure a clean login process
+      await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    }
+  }
+
+  public async Task LoginUser()
+  {
+    // 使用者聲明
+    var userClaims = new List <Claim>
+    {
+        new Claim(ClaimTypes.Name, "beauty"), // 使用者識別碼
+        new Claim(ClaimTypes.Sid, Guid.NewGuid().ToString()), // 登入識別序號
+        new Claim(ClaimTypes.GivenName, "甄美麗"), // 顯示名稱
+        new Claim(ClaimTypes.Role, "Admin"),
+    };
+
+    var userIdentity = new ClaimsIdentity(userClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+    var authProperties = new AuthenticationProperties
+      {
+        IsPersistent = false, // authUser.RememberMe,
+        IssuedUtc = DateTime.UtcNow, // authUser.IssuedUtc,
+        ExpiresUtc = DateTime.UtcNow.AddMinutes(30), // authUser.ExpiresUtc,
+        RedirectUri = ReturnUrl, // this.Request.Host.Value
+        //AllowRefresh = <bool>,
+        // Refreshing the authentication session should be allowed.
+      };
+
+    //# 執行 Cookie-Base Auth 註冊
+    await HttpContext.SignInAsync(
+        CookieAuthenticationDefaults.AuthenticationScheme,
+        new ClaimsPrincipal(userIdentity),
+        authProperties);
+
+    Logger.LogInformation("User logged in.");
+    navSvc.NavigateTo(ReturnUrl ?? "/", true);
+  }
+
+  private sealed class InputModel
+  {
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = "foo@mail.server";
+
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; } = "bar";
+
+    [Display(Name = "Remember me?")]
+    public bool RememberMe { get; set; }
+  }
+}

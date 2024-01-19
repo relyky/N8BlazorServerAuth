@@ -1,0 +1,42 @@
+﻿@page "/auth"
+@* @attribute [Authorize] *@
+@attribute [AllowAnonymous]
+
+<PageTitle>授權狀態</PageTitle>
+
+<h1>授權狀態</h1>
+
+<AuthorizeView Context="auth">
+  <Authorized>
+    <h2>You are authenticated</h2>
+    <h2>Hello @auth.User.Identity?.Name</h2>
+  </Authorized>
+  <Authorizing>
+    <h2>In authorizing...</h2>
+  </Authorizing>
+  <NotAuthorized>
+    <h2>Not Authorized</h2>
+  </NotAuthorized>
+</AuthorizeView>
+
+<hr />
+<h5>Auth State</h5>
+<dl>
+  <dt>IsAuthenticated</dt>
+  <dd>@authUser?.Identity?.IsAuthenticated</dd>
+  <dt>Name</dt>
+  <dd>@authUser?.Identity?.Name</dd>
+</dl>
+
+@code {
+  [CascadingParameter] Task<AuthenticationState> AuthStateTask { get; set; } = default!;
+
+  //## State
+  System.Security.Claims.ClaimsPrincipal? authUser = null;
+
+  protected override async Task OnInitializedAsync()
+  {
+    var authState = await AuthStateTask; // 現在登入狀態
+    authUser = authState?.User;
+  }
+}
