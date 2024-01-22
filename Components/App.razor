@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Components.Sections
+<!DOCTYPE html>
 <html lang="zh-hant">
 
 <head>
@@ -11,6 +12,7 @@
   <link rel="stylesheet" href="N8BlazorServerAuth.styles.css" />
   <link rel="icon" type="image/png" href="favicon.png" />
   <HeadOutlet @rendermode="@RenderModeForPage" />
+  <SectionOutlet @rendermode="@RenderModeForPage" SectionName="myHeadScript" />
 </head>
 
 <body>
