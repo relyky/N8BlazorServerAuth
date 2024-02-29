@@ -39,6 +39,15 @@
     await HandleRefresh();
   }
 
+  // protected override async Task OnAfterRenderAsync(bool firstRender)
+  // {
+  //   if(firstRender)
+  //   {
+  //     await HandleRefresh();
+  //     StateHasChanged();
+  //   }
+  // }
+
   async Task HandleRefresh()
   {
     try
