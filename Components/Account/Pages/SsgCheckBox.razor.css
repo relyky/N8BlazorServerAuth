@@ -1,0 +1,16 @@
+﻿
+.mud-checkbox-input ~ svg[role=checked-icon] {
+  display: none;
+}
+
+.mud-checkbox-input ~ svg[role=uncheck-icon] {
+  display: block;
+}
+
+.mud-checkbox-input:checked ~ svg[role=checked-icon] {
+  display: block;
+}
+
+.mud-checkbox-input:checked ~ svg[role=uncheck-icon] {
+  display: none;
+}
