@@ -6,62 +6,93 @@
 @using N8BlazorServerAuth.Services
 
 @page "/Account/Login"
+@* @attribute [StreamRendering] 啟動就無法寫入 HttpContext.SignInAsync。(Orz) *@
 @inject NavigationManager navSvc
-@inject ILogger<Login> Logger
+@inject ILogger<Login> logger
 @inject AccountService accSvc
 
-<PageTitle>Log in</PageTitle>
-@* 
-  此登入畫面使用 Bootstrap 5 實作。 
-  此登入畫面 不支援 interactive render。
+<PageTitle>Login</PageTitle>
+@*
+  登入畫面為 SSG，不支援 interactive 操作行為。
 *@
 
-<HeadContent>
-  <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
-</HeadContent>
+@* 考慮用 Bootstrp5 實作登入畫面
+  <HeadContent>
+    <link rel="stylesheet" href="bootstrap/bootstrap.min.css" />
+  </HeadContent>
+ *@
 
-<div class="d-flex flex-column justify-content-center align-items-center" style="height:100vh;">
-  <h1>Log in</h1>
+@* @if (f_processing)
+{
+  <h1>processing...</h1>
+  return;
+} *@
 
-  @if (errorMessage != null)
-  {
-    <div class="alert alert-danger" role="alert">
-      @errorMessage
-    </div>
-  }
+<AuthorizeView Context="auth">
+  <Authorized>
+    <MudText Typo=Typo.h2>
+      @($"{auth.User.Identity?.Name} 已登入系統")
+    </MudText>
+  </Authorized>
+  <Authorizing>
+    <MudText Typo=Typo.h2>登入中</MudText>
+  </Authorizing>
+  <NotAuthorized>
 
-  <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
-    <DataAnnotationsValidator />
-    <div class="card" style="width:400px;">
-      <div class="card-body">
+    <EditForm Model="Input" method="post" OnValidSubmit=LoginUserAsync FormName="login">
+      <DataAnnotationsValidator />
+      <MudCard Class="ma-16 pa-4 mx-auto" Style="max-width:400px;background:var(--mud-palette-background-grey);">
+        <MudCardHeader>
+          <CardHeaderContent>
+            <MudText Typo=Typo.h6>登入</MudText>
+          </CardHeaderContent>
+          <CardHeaderActions>
+            <MudIconButton Icon=@Icons.Material.Filled.Settings Color=Color.Default />
+          </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+          @* 在 SSG form input 欄位需加上 name 屬性 *@
+          <MudTextField T="string" Label="Email" name="Input.Email" Placeholder="name@example.com"
+                        @bind-Value="Input.Email" For="() => Input.Email"
+                        Variant=Variant.Outlined Class="mb-4" Style="background:var(--mud-palette-background);" />
+          <MudTextField T="string" Label="Password" name="Input.Password" Placeholder="password"
+                        @bind-Value="Input.Password" For="() => Input.Password" InputType=InputType.Password
+                        Variant=Variant.Outlined Class="mb-4" Style="background:var(--mud-palette-background);" />
 
-        <h3>Use a local account to log in.</h3>
-        <hr />
-        <ValidationSummary class="text-danger" role="alert" />
-        <div class="form-floating mb-3">
-          <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-          <label for="email" class="form-label">Email</label>
-          <ValidationMessage For="() => Input.Email" class="text-danger" />
-        </div>
-        <div class="form-floating mb-3">
-          <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-          <label for="password" class="form-label">Password</label>
-          <ValidationMessage For="() => Input.Password" class="text-danger" />
-        </div>
-        <div class="checkbox mb-3">
-          <label class="form-label">
-            <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-            Remember me
-          </label>
-        </div>
-        <div>
-          <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-        </div>
+          @* <MudCheckBox T="bool" Color=Color.Primary Label="記住我" /> *@
 
-      </div>
-    </div>
-  </EditForm>
-</div>
+          <SsgCheckBox Label="記住我" Name="Input.RememberMe" @bind-Value=@Input.RememberMe For="() => Input.RememberMe" />
+
+          @* <ValidationSummary role="alert" class="mud-alert-text-error" /> *@
+
+          @if (errorMessage != null)
+          {
+            <MudAlert Severity=Severity.Error>
+              @errorMessage
+            </MudAlert>
+          }
+
+        </MudCardContent>
+        <MudCardActions Class="justify-center">
+          <MudButton Variant=Variant.Filled Color=Color.Primary ButtonType=ButtonType.Submit Disabled=@f_processing Size=Size.Large>
+            @if (f_processing)
+            {
+              <MudProgressCircular Size=Size.Small Indeterminate />
+              <MudText Class="ms-2">登入中…</MudText>
+            }
+            else
+            {
+              <MudIcon Icon=@Icons.Material.Filled.Login />
+              <MudText Class="ms-2">登入</MudText>
+            }
+          </MudButton>
+        </MudCardActions>
+      </MudCard>
+
+    </EditForm>
+
+  </NotAuthorized>
+</AuthorizeView>
 
 @code {
   [CascadingParameter]
@@ -74,24 +105,33 @@
   private string? ReturnUrl { get; set; }
 
   string? errorMessage;
+  bool f_processing = false;
 
   protected override async Task OnInitializedAsync()
   {
+    f_processing = true;
+
     if (HttpMethods.IsGet(HttpContext.Request.Method))
     {
       // Clear the existing external cookie to ensure a clean login process
       await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
+
+    f_processing = false;
   }
 
   [ValidateAntiForgeryToken]
-  public async Task LoginUser()
+  public async Task LoginUserAsync()
   {
+    f_processing = true;
     errorMessage = null;
-    var authUser = accSvc.Authenticate($"{Input.Email}:{Input.Password}:{Input.RememberMe}");
+
+    await Task.Delay(2000);
+    var authUser = await Task.Run(() => accSvc.Authenticate($"{Input.Email}:{Input.Password}:{Input.RememberMe}"));
     if (authUser == null)
     {
       errorMessage = "Error: Invalid login attempt.";
+      f_processing = false;
       return;
     }
 
@@ -124,7 +164,7 @@
         new ClaimsPrincipal(userIdentity),
         authProperties);
 
-    Logger.LogInformation("User logged in.");
+    logger.LogInformation("User logged in.");
     navSvc.NavigateTo(ReturnUrl ?? "/", true);
   }
 

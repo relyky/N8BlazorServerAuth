@@ -1,16 +1,26 @@
-﻿@* @inherits MudBooleanInput<bool> *@
+﻿@* 參考自:MudBlazor MudCheckBox 簡化 *@
+@* 設計用於 SSG 無 interactive 畫面 *@
 
 <div class="mud-input-control mud-input-control-boolean-input">
   <div class="mud-input-control-input-container">
-    <label class="mud-checkbox" id="@_elementId">
-      <span tabindex="0" class="mud-button-root mud-icon-button mud-default-text hover:mud-default-hover mud-ripple mud-ripple-checkbox" style="--mud-ripple-offset-x: 65px; --mud-ripple-offset-y: -2.90625px;">
-        <InputCheckbox Value=@Value ValueChanged=@OnValueChanged name=@Name ValueExpression=@For tabindex="-1" class="mud-checkbox-input" />
-        <!--!-->
-        <!--!-->
-        <MudIcon Icon="@GetIcon()" Color=Color.Inherit Size=@Size />
+    <label class="mud-checkbox">
+      <span tabindex="0" class="mud-button-root mud-icon-button mud-primary-text hover:mud-primary-hover mud-ripple mud-ripple-checkbox" style="width:48px; height:48px;">
+        <InputCheckbox Value=@Value ValueChanged=@ValueChanged name=@Name ValueExpression=@For tabindex="-1" class="mud-checkbox-input" />
+        <!--bl:72-->
+        <svg role="uncheck-icon" class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M0 0h24v24H0z" fill="none" />
+          <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+        </svg>
+        <!--/bl:72-->
+        <!--bl:74-->
+        <svg role="checked-icon" class="mud-icon-root mud-svg-icon mud-icon-size-medium" focusable="false" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M0 0h24v24H0z" fill="none" />
+          <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+        </svg>
+        <!--/bl:74-->
       </span>
       <!--!-->
-      <p class="mud-typography mud-typography-body1">@Label</p>
+      <div class="mud-typography mud-typography-body1">@Label</div>
     </label>
   </div>
 </div>
@@ -21,49 +31,4 @@
   [Parameter] public bool Value { get; set; }
   [Parameter] public EventCallback<bool> ValueChanged { get; set; }
   [Parameter] public System.Linq.Expressions.Expression<Func<bool>>? For { get; set; }
-
-  /// <summary>
-  /// Custom checked icon, leave null for default.
-  /// </summary>
-  [Parameter]
-  [Category(CategoryTypes.FormComponent.Appearance)]
-  public string CheckedIcon { get; set; } = Icons.Material.Filled.CheckBox;
-
-  /// <summary>
-  /// Custom unchecked icon, leave null for default.
-  /// </summary>
-  [Parameter]
-  [Category(CategoryTypes.FormComponent.Appearance)]
-  public string UncheckedIcon { get; set; } = Icons.Material.Filled.CheckBoxOutlineBlank;
-
-  /// <summary>
-  /// Custom indeterminate icon, leave null for default.
-  /// </summary>
-  [Parameter]
-  [Category(CategoryTypes.FormComponent.Appearance)]
-  public string IndeterminateIcon { get; set; } = Icons.Material.Filled.IndeterminateCheckBox;
-
-  /// <summary>
-  /// The Size of the component.
-  /// </summary>
-  [Parameter]
-  [Category(CategoryTypes.FormComponent.Appearance)]
-  public Size Size { get; set; } = Size.Medium;
-
-  private string _elementId = "checkbox" + Guid.NewGuid().ToString().Substring(0, 8);
-
-  protected Task OnValueChanged(bool value)
-  {
-    return ValueChanged.InvokeAsync(value);
-  }
-
-  private string GetIcon()
-  {
-    return Value switch
-    {
-      true => CheckedIcon,
-      _ => UncheckedIcon,
-      //_ => IndeterminateIcon
-    };
-  }
 }
