@@ -1,0 +1,69 @@
+﻿@* @inherits MudBooleanInput<bool> *@
+
+<div class="mud-input-control mud-input-control-boolean-input">
+  <div class="mud-input-control-input-container">
+    <label class="mud-checkbox" id="@_elementId">
+      <span tabindex="0" class="mud-button-root mud-icon-button mud-default-text hover:mud-default-hover mud-ripple mud-ripple-checkbox" style="--mud-ripple-offset-x: 65px; --mud-ripple-offset-y: -2.90625px;">
+        <InputCheckbox Value=@Value ValueChanged=@OnValueChanged name=@Name ValueExpression=@For tabindex="-1" class="mud-checkbox-input" />
+        <!--!-->
+        <!--!-->
+        <MudIcon Icon="@GetIcon()" Color=Color.Inherit Size=@Size />
+      </span>
+      <!--!-->
+      <p class="mud-typography mud-typography-body1">@Label</p>
+    </label>
+  </div>
+</div>
+
+@code {
+  [Parameter] public string Name { get; set; } = default!;
+  [Parameter] public string Label { get; set; } = default!;
+  [Parameter] public bool Value { get; set; }
+  [Parameter] public EventCallback<bool> ValueChanged { get; set; }
+  [Parameter] public System.Linq.Expressions.Expression<Func<bool>>? For { get; set; }
+
+  /// <summary>
+  /// Custom checked icon, leave null for default.
+  /// </summary>
+  [Parameter]
+  [Category(CategoryTypes.FormComponent.Appearance)]
+  public string CheckedIcon { get; set; } = Icons.Material.Filled.CheckBox;
+
+  /// <summary>
+  /// Custom unchecked icon, leave null for default.
+  /// </summary>
+  [Parameter]
+  [Category(CategoryTypes.FormComponent.Appearance)]
+  public string UncheckedIcon { get; set; } = Icons.Material.Filled.CheckBoxOutlineBlank;
+
+  /// <summary>
+  /// Custom indeterminate icon, leave null for default.
+  /// </summary>
+  [Parameter]
+  [Category(CategoryTypes.FormComponent.Appearance)]
+  public string IndeterminateIcon { get; set; } = Icons.Material.Filled.IndeterminateCheckBox;
+
+  /// <summary>
+  /// The Size of the component.
+  /// </summary>
+  [Parameter]
+  [Category(CategoryTypes.FormComponent.Appearance)]
+  public Size Size { get; set; } = Size.Medium;
+
+  private string _elementId = "checkbox" + Guid.NewGuid().ToString().Substring(0, 8);
+
+  protected Task OnValueChanged(bool value)
+  {
+    return ValueChanged.InvokeAsync(value);
+  }
+
+  private string GetIcon()
+  {
+    return Value switch
+    {
+      true => CheckedIcon,
+      _ => UncheckedIcon,
+      //_ => IndeterminateIcon
+    };
+  }
+}
