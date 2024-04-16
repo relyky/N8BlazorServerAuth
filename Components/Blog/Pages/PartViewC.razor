@@ -1,0 +1,39 @@
+﻿<h3>PartView C</h3>
+<div class="d-flex gap-2 flex-wrap">
+  @if (simsGoogs1 != null)
+  {
+    foreach (var i in simsGoogs1)
+    {
+      <MudCard>
+        <MudCardHeader>
+          <CardHeaderContent>
+            <MudText Typo="Typo.h6">模擬商品 @($"{i:0000}")</MudText>
+          </CardHeaderContent>
+          <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" />
+          </CardHeaderActions>
+        </MudCardHeader>
+        <MudCardContent>
+          <MudText>This day everything happened.</MudText>
+          <MudText Typo="Typo.body2">The quick, brown fox jumps over a lazy dog.</MudText>
+        </MudCardContent>
+        <MudCardActions>
+          <MudButton Variant="Variant.Text" Color="Color.Primary">Read More</MudButton>
+        </MudCardActions>
+      </MudCard>
+    }
+  }
+</div>
+
+@code {
+  bool f_loading = false;
+  int[]? simsGoogs1 = null;
+
+  protected override async Task OnInitializedAsync()
+  {
+    f_loading = true;
+    await Task.Delay(500);
+    simsGoogs1 = Enumerable.Range(1, 9).ToArray();
+    f_loading = false;
+  }
+}

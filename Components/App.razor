@@ -30,7 +30,7 @@
   private IComponentRenderMode? RenderModeForPage => HttpContext.Request.Path switch
   {
     var x when x.StartsWithSegments("/Account") => null,
-    var x when x.StartsWithSegments("/Shopping") => null,
+    var x when x.StartsWithSegments("/Blog") => null,
     _ => InteractiveServer
   };
 

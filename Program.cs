@@ -24,8 +24,9 @@ builder.Services.AddHttpContextAccessor();
 /// ref ¡÷ https://blazorhelpwebsite.com/ViewBlogPost/36
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
-  options.CheckConsentNeeded = context => true;
   options.MinimumSameSitePolicy = SameSiteMode.Strict;
+  options.CheckConsentNeeded = context => true;
+  options.ConsentCookie.Name = "GDPRConsent";
 });
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(cfg =>
