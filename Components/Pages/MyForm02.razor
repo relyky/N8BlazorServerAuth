@@ -1,0 +1,14 @@
+﻿@page "/myform02"
+@attribute [Authorize(Roles = "MYFORM02")]
+
+<MudContainer>
+  <MudText Typo=Typo.h2>MyForm02</MudText>
+  <MudAlert Severity=Severity.Error>
+    <MudText Typo=Typo.h2>用 F5 刷新畫面會404！這應該是微軟的bug！囧囧囧囧囧</MudText>
+  </MudAlert>
+
+</MudContainer>
+
+@code {
+
+}

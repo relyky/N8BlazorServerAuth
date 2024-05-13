@@ -34,6 +34,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
       cfg.LoginPath = "/Accout/Login"; // default: /Accout/Login
       cfg.Cookie.Name = ".N8BlazorServerAuth.Cookies"; //default:.AspNetCore.Cookies
     });
+builder.Services.AddCascadingAuthenticationState();
 
 //§§ 註冊：客製服務
 builder.Services.AddSingleton<AccountService>();
