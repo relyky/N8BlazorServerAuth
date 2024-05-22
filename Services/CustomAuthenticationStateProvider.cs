@@ -17,7 +17,7 @@ internal class CustomAuthenticationStateProvider(IHttpContextAccessor _http) : A
     }
 
     // 加值
-    userIdentity.AddClaim(new Claim(ClaimTypes.Role, "MYFORM02"));
+    userIdentity.AddClaim(new Claim(ClaimTypes.Role, "MYFORM02")); // 可能無效！
 
     // Success
     return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(userIdentity)));

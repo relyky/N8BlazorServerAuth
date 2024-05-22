@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+ï»¿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Authorization;
 using N8BlazorServerAuth.Components;
 using N8BlazorServerAuth.Services;
@@ -13,15 +13,18 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMudServices();
 
 //# for BLAZOR COOKIE Auth
-builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+/// åƒè€ƒï¼š[é‡å°éŒ¯èª¤é€²è¡Œç–‘é›£æ’è§£](https://learn.microsoft.com/zh-tw/aspnet/core/blazor/security/?view=aspnetcore-8.0#troubleshoot-errors)
+/// åœ¨.NET 8 æˆ–æ›´æ–°ç‰ˆæœ¬ä¸­ï¼Œè«‹å‹¿ä½¿ç”¨ CascadingAuthenticationState å…ƒä»¶
+builder.Services.AddCascadingAuthenticationState();
+//builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>(); // F5åˆ·æ–°UIæ™‚æœƒç„¡æ•ˆï¼
 builder.Services.AddHttpContextAccessor();
-/// ¡° ¤£­n¦b«eºİ¤¸¥ó¨Ï¥Î IHttpContextAccesser ¦]¬° HttpContext ªºª¬ºA¨Ã«D§Y®É¤ÏÀ³ªº¡A
-/// ¦¨¦]¬O SignalR »P HTTP ¬O¤£¦Pªº³q°T¨ó©w¥B­ì«h¤W¤£¯à¦@¦s¡C
-/// ¦ı Blazor Server App ¤S¤ä´© Cookie Authentication¡C
-/// §ï¥Î AuthenticationStateProvider ¾÷¨î¨úµn¤Jª¬ºA¡C
+/// â€» ä¸è¦åœ¨å‰ç«¯å…ƒä»¶ä½¿ç”¨ IHttpContextAccesser å› ç‚º HttpContext çš„ç‹€æ…‹ä¸¦éå³æ™‚åæ‡‰çš„ï¼Œ
+/// æˆå› æ˜¯ SignalR èˆ‡ HTTP æ˜¯ä¸åŒçš„é€šè¨Šå”å®šä¸”åŸå‰‡ä¸Šä¸èƒ½å…±å­˜ã€‚
+/// ä½† Blazor Server App åˆæ”¯æ´ Cookie Authenticationã€‚
+/// æ”¹ç”¨ AuthenticationStateProvider æ©Ÿåˆ¶å–ç™»å…¥ç‹€æ…‹ã€‚
 
 //## for BLAZOR COOKIE Auth
-/// ref ¡÷ https://blazorhelpwebsite.com/ViewBlogPost/36
+/// ref â†’ https://blazorhelpwebsite.com/ViewBlogPost/36
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
   options.MinimumSameSitePolicy = SameSiteMode.Strict;
@@ -34,9 +37,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
       cfg.LoginPath = "/Accout/Login"; // default: /Accout/Login
       cfg.Cookie.Name = ".N8BlazorServerAuth.Cookies"; //default:.AspNetCore.Cookies
     });
-builder.Services.AddCascadingAuthenticationState();
 
-//¡±¡± µù¥U¡G«È»sªA°È
+//Â§Â§ è¨»å†Šï¼šå®¢è£½æœå‹™
 builder.Services.AddSingleton<AccountService>();
 
 var app = builder.Build(); //--------------------------------------------------
@@ -59,10 +61,10 @@ app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
 
-//¡±¡± HTTP 400-599 ¿ù»~³B²z 
-/// ®Ú¾Ú¹w³]¡AASP.NET Core À³¥Îµ{¦¡¤£·|´£¨Ñ HTTP ¿ù»~ª¬ºA½X (¨Ò¦p¡u404 - §ä¤£¨ì¡v) ªºª¬ºA½X­¶­±¡C 
-/// ·íÀ³¥Îµ{¦¡³]©w¨S¦³¥»¤åªº HTTP 400-599 ¿ù»~ª¬ºA½X®É¡A¥¦·|¶Ç¦^¸Óª¬ºA½X©M¤@­ÓªÅ¥Õªº¦^À³¥»¤å¡C 
-/// ref¡÷https://learn.microsoft.com/zh-tw/aspnet/core/fundamentals/error-handling?view=aspnetcore-8.0#usestatuscodepages
+//Â§Â§ HTTP 400-599 éŒ¯èª¤è™•ç† 
+/// æ ¹æ“šé è¨­ï¼ŒASP.NET Core æ‡‰ç”¨ç¨‹å¼ä¸æœƒæä¾› HTTP éŒ¯èª¤ç‹€æ…‹ç¢¼ (ä¾‹å¦‚ã€Œ404 - æ‰¾ä¸åˆ°ã€) çš„ç‹€æ…‹ç¢¼é é¢ã€‚ 
+/// ç•¶æ‡‰ç”¨ç¨‹å¼è¨­å®šæ²’æœ‰æœ¬æ–‡çš„ HTTP 400-599 éŒ¯èª¤ç‹€æ…‹ç¢¼æ™‚ï¼Œå®ƒæœƒå‚³å›è©²ç‹€æ…‹ç¢¼å’Œä¸€å€‹ç©ºç™½çš„å›æ‡‰æœ¬æ–‡ã€‚ 
+/// refâ†’https://learn.microsoft.com/zh-tw/aspnet/core/fundamentals/error-handling?view=aspnetcore-8.0#usestatuscodepages
 app.UseStatusCodePagesWithRedirects("/ErrorStatus/{0}");
 
 app.MapRazorComponents<App>()
